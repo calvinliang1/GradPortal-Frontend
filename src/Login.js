@@ -2,7 +2,7 @@ import React from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Link,Box,
 	Card,CardContent,Divider,CardActions} from "@mui/material";
 import './login.css';
-class App extends React.Component {
+class Login extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = { username: "", password:"", authflag:1 };
@@ -83,4 +83,4 @@ class App extends React.Component {
     );
 	}
 }
-export default App;
+export default Login;
