@@ -1,41 +1,48 @@
 import React,{ useState } from "react";
-import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Link,Box,
+import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,
 	Card,CardContent,Divider,CardActions} from "@mui/material";
 import { Link as RouterLink, useNavigate, Navigate} from 'react-router-dom';
 import './login.css';
 import {onAuthStateChanged} from "firebase/auth";
-import {signin} from './Firebase';
+import {signup} from './Firebase';
 
-//class Login extends React.Component {
-function Login(){
+function Signup () {
 	let navigate = useNavigate();
 
 	const [userName, setUsername] = useState('');
   const [passWord, setPassword] = useState('');
-  
-  const handleusernameChange = e =>{
+  const [vpassWord, setvPassword] = useState('');
+
+	const handleusernameChange = e =>{
   	setUsername(e.target.value);
   }
 
   const handlepasswordChange = e =>{
   	setPassword(e.target.value);
   }
-  /*
-		fetch('http://localhost:5000/student',{
-      		'methods':'GET',
-      		headers : {
-        		'Content-Type':'application/json'
-      		}
-    	})
-    	.then(response => response.json())
-    	.then(response => {response.forEach(function(obj) { console.log(obj.name); });})
-    	.catch(error => console.log(error))
-	}*/
+
+  const handlevpasswordChange = e =>{
+  	setvPassword(e.target.value);
+  }
+
 	async function handleSubmit(event) {
 		event.preventDefault();
-		await signin(userName, passWord);
-		navigate("/studentprogress1");
+			if(userName.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)&&
+				passWord.length>=8)
+			{
+				if(passWord===vpassWord){
+					await signup(userName, passWord);
+					navigate("/studentprogress1");
+				}
+				else
+					alert('Verify the two passwords are right, not the same!');
+			}	
+			else
+			{
+				alert('Validate if your password is at least 8 values long and the username entered is valid email');
+			}
 	}
+
 		return (
     	<div>
         <Box>
@@ -51,7 +58,7 @@ function Login(){
 						<Grid container direction="column" justifyContent="center" spacing={1} className="login-form">
 							<Paper sx={{backgroundColor:"#ededed"}} variant="elevation" elevation={2} >
 								<Grid item>
-									<Typography component="h1" variant="h5">Log In</Typography>
+									<Typography component="h1" variant="h5">Sign up</Typography>
 								</Grid>
 								<Grid item>
 									<form onSubmit={handleSubmit}>
@@ -61,40 +68,25 @@ function Login(){
 												onChange={handleusernameChange} required autoFocus/>
 											</Grid>
 											<Grid item>
-												<TextField type="password" placeholder="Password" name="password" variant="outlined"value={passWord} 
+												<TextField type="password" placeholder="Password" name="password" variant="outlined" value={passWord} 
 												onChange={handlepasswordChange} required autoFocus/>
 											</Grid>
 											<Grid item>
-												<Button variant="contained" color="primary" type="submit" className="button-block"> Login </Button>
+												<TextField type="password" placeholder="Verify Password" name="verifypassword" variant="outlined" value={vpassWord} 
+												onChange={handlevpasswordChange} required autoFocus/>
+											</Grid>
+											<Grid item>
+												<Button variant="contained" color="primary" type="submit" className="button-block">Sign up now</Button>
 											</Grid>
 										</Grid>
 									</form>
-								</Grid>
-								<Grid item>
-									<Link href="/" variant="body2"> Forgot Password?</Link>
 								</Grid>
 							</Paper>
 						</Grid>
 					</Grid>	
 				</Grid>
-				<Box className="register-area">
-					<Box className="student-area">
-						<Card sx={{ maxWidth: 400, backgroundColor: "#d4e4ff"}}>
-							<CardContent>
-								<Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold"}}>Student</Typography>
-								<Divider />
-								<Typography variant="p" component="div" sx={{fontWeight: 100, flexGrow: 1, maxWidth: 400}}>
-								Are you a student looking to apply for graduate programs? Register today to connect with professors
-								that are suitable for you.
-								</Typography>
-							</CardContent>
-							<CardActions>
-								<Button size="small" variant="contained" color="primary" component={RouterLink} to="/signup">Register as student</Button>
-							</CardActions>
-						</Card>
-					</Box>
-				</Box>
 			</div>
     );
+	
 }
-export default Login;
+export default Signup;

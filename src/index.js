@@ -1,8 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Login from "./Login"
+import {
+  BrowserRouter,
+  Route,
+  Link,
+  Routes,
+} from "react-router-dom";
+
+import App from "./App"
 
 ReactDOM.render(
-    <Login />,
-    document.querySelector("#root")
+		<App />,
+  document.querySelector("#root")
 );
