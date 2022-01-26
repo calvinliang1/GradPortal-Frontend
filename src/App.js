@@ -13,6 +13,7 @@ import StudentStep2 from "./StudentStep2"
 import StudentStep3 from "./StudentStep3"
 import StudentStep4 from "./StudentStep4"
 import StudentStep5 from "./StudentStep5"
+import Main from "./Main"
 import {useAuth} from './Firebase';
 
 function App()
@@ -29,6 +30,7 @@ function App()
 					<Route path = "/studentprogress3" element={<StudentStep3/>}/>
 					<Route path = "/studentprogress4" element={<StudentStep4/>}/>
 					<Route path = "/studentprogress5" element={<StudentStep5/>}/>
+					<Route path = "/in" element={<Main/>}/>
 				</Routes>
 			</Router>
 		</div>

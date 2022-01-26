@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,MenuItem,
 	Divider,LinearProgress} from "@mui/material";
 import { Link as RouterLink, MemoryRouter, useNavigate} from 'react-router-dom';
@@ -11,17 +11,18 @@ function StudentStep4 () {
 	const [resume, setresume] = useState('');
   const [cv, setcv] = useState('');
 
-  /*
-	constructor(props) {
-		super(props);
-		this.state = {resume: "", cv: ""};
-		this.handleChange = this.handleChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
-	}	
-	handleChange(event) {
-		this.setState({resume: event.state.resume, cv: event.state.cv});
-	}*/
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
 
+        if (authToken) {
+            navigate('/studentprogress4')
+        }
+
+        if (!authToken) {
+            navigate('/login')
+        }
+    },[]);
+  
 	const handleresumeChange = e =>{
   	setresume(e.target.value);
   }
@@ -40,10 +41,11 @@ function StudentStep4 () {
 	}
 
 	async function handleLogout(event) {
-		event.preventDefault();
-		await signout();
-		navigate("/Login");
-	}
+    event.preventDefault();
+    await signout();
+    sessionStorage.removeItem('Auth Token');
+    navigate("/Login");
+  }
 
 	const handleBefore =() =>{
 		navigate("/studentprogress3");

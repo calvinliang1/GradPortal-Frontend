@@ -1,10 +1,10 @@
-import React,{ useState } from "react";
+import React,{ useState,useEffect} from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Link,Box,
 	Card,CardContent,Divider,CardActions} from "@mui/material";
 import { Link as RouterLink, useNavigate, Navigate} from 'react-router-dom';
 import './login.css';
 import {onAuthStateChanged} from "firebase/auth";
-import {signin} from './Firebase';
+import {signin,auth} from './Firebase';
 
 //class Login extends React.Component {
 function Login(){
@@ -20,6 +20,7 @@ function Login(){
   const handlepasswordChange = e =>{
   	setPassword(e.target.value);
   }
+
   /*
 		fetch('http://localhost:5000/student',{
       		'methods':'GET',
@@ -33,8 +34,18 @@ function Login(){
 	}*/
 	async function handleSubmit(event) {
 		event.preventDefault();
-		await signin(userName, passWord);
-		navigate("/studentprogress1");
+		await signin(userName, passWord).then((response) => {
+					console.log(response)
+          sessionStorage.setItem('Auth Token', response._tokenResponse.idToken)
+          if(sessionStorage.getItem("finished")!=null){
+      			navigate("/in");
+        	}
+          else{
+          	navigate('/studentprogress1')
+          }
+        }).catch((error) => {
+  					alert("Re-type user info, password or username may be wrong or does not exist");
+					});
 	}
 		return (
     	<div>

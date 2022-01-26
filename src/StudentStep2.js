@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect  } from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,MenuItem,
   Divider,LinearProgress,InputLabel} from "@mui/material";
 import { Link as RouterLink, MemoryRouter, useNavigate} from 'react-router-dom';
@@ -8,14 +8,27 @@ import {auth,signout} from './Firebase';
 function StudentStep2 () {
 	let navigate = useNavigate();
 
-  const [academicinfolist, setacainfolist] = useState([{country:"",aname:"",degree_type:"",
-	start_date:"",end_date:"",gpa:""}]);
+  const [academicinfolist, setacainfolist] = useState(JSON.parse(sessionStorage.getItem("academicinfolist"))||
+    [{country:"",aname:"",degree_type:"", start_date:"",end_date:"",gpa:""}]);
 
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
+
+        if (authToken) {
+            navigate('/studentprogress2')
+        }
+
+        if (!authToken) {
+            navigate('/login')
+        }
+    },[]);
+  
   const handleAddClick= event =>{
     event.preventDefault()
     let academics = academicinfolist.concat([{country:"",aname:"",degree_type:"",
 		start_month:"",start_year:"",end_month:"",end_year:"",gpa:""}]);
     setacainfolist(academics);
+    sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
   }
 
   const handleDelete = i => e => {
@@ -26,6 +39,7 @@ function StudentStep2 () {
         ...academicinfolist.slice(i + 1)
       ]
       setacainfolist(academics);
+      sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
     }
   }
 
@@ -34,6 +48,7 @@ function StudentStep2 () {
   	let academics = [...academicinfolist];
   	academics[index]={...academics[index],[name]: value};
   	setacainfolist(academics);
+    sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
   }
 
   const handleSubmit =() => {
@@ -57,6 +72,12 @@ function StudentStep2 () {
   const handleBefore =() =>{
     navigate("/studentprogress1");
   }
+  async function handleLogout(event) {
+    event.preventDefault();
+    await signout();
+    sessionStorage.removeItem('Auth Token');
+    navigate("/Login");
+  }
 	
 		return (
     	<div>
@@ -64,7 +85,7 @@ function StudentStep2 () {
           <AppBar position="static" alignitems="center" color="primary">
 						<Toolbar>
 							<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Gradportal</Typography>
-							<Button color="inherit" component={RouterLink} to="/login">Logout</Button>
+							<Button color="inherit" component={RouterLink} to="/login" onClick={handleLogout}>Logout</Button>
 						</Toolbar>			
 					</AppBar>
 				</Box>

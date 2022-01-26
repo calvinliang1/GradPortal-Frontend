@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,MenuItem,
   Divider,LinearProgress} from "@mui/material";
 import { Link as RouterLink, MemoryRouter, useNavigate} from 'react-router-dom';
@@ -10,6 +10,18 @@ function StudentStep3 (){
 
   const [accomplishmentslist, setalist] = useState([{type:"", details:"", media:""}]);
   const [certificationslist, setclist] = useState([{type:"", details:"", media:""}]);
+
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
+
+        if (authToken) {
+            navigate('/studentprogress3')
+        }
+
+        if (!authToken) {
+            navigate('/login')
+        }
+    },[]);
 
   const handleAtypeChange = i => event =>{
     let accomplishments = [...accomplishmentslist];
@@ -103,6 +115,7 @@ function StudentStep3 (){
   async function handleLogout(event) {
     event.preventDefault();
     await signout();
+    sessionStorage.removeItem('Auth Token');
     navigate("/Login");
   }
 		return (
@@ -111,7 +124,7 @@ function StudentStep3 (){
           <AppBar position="static" alignitems="center" color="primary">
 						<Toolbar>
 							<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Gradportal</Typography>
-							<Button color="inherit" component={RouterLink} to="/login">Logout</Button>
+							<Button color="inherit" component={RouterLink} to="/login" onClick={handleLogout}>Logout</Button>
 						</Toolbar>			
 					</AppBar>
 				</Box>

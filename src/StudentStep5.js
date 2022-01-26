@@ -1,15 +1,28 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,MenuItem,
 	Divider,LinearProgress} from "@mui/material";
-import { Link as RouterLink, MemoryRouter, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, MemoryRouter, useNavigate, useParams } from 'react-router-dom';
 import './login.css';
 import {auth,signout} from './Firebase';
 
 function StudentStep5 () {
 	let navigate = useNavigate();
+  let params = useParams();
 
   const [research_interests, setrinterests] = useState(['']);
 
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
+
+        if (authToken) {
+            navigate('/studentprogress5')
+        }
+
+        if (!authToken) {
+            navigate('/login')
+        }
+    },[]);
+  
   const handleInputChange = i => event =>{
     let researchs = [...research_interests];
     researchs[i] = event.target.value;
@@ -40,8 +53,10 @@ function StudentStep5 () {
         break;
       }
     }
-    if(noempty==0)
-      alert("Valid");
+    if(noempty==0){
+      navigate("/in");
+      sessionStorage.setItem("finished","1");
+    }
     else
       alert('Empty interest field');
   }
@@ -51,7 +66,8 @@ function StudentStep5 () {
   async function handleLogout(event) {
     event.preventDefault();
     await signout();
-    navigate("/Login");
+    sessionStorage.removeItem('Auth Token');
+    navigate("/login");
   }
 		return (
     	<div>
