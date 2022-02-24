@@ -4,22 +4,25 @@ import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,I
 import {MenuIcon,AccountCircle} from '@mui/icons-material/';
 import { Link as RouterLink, MemoryRouter, useNavigate} from 'react-router-dom';
 import './login.css';
+import ConfigData from "ConfigData";
 import {auth,signout} from './Firebase';
 
 function StudentStep1() {
 	let navigate = useNavigate();
-	let studentid = "";
 	let authToken = sessionStorage.getItem('Auth Token');
 
 	const [username, setusername] = React.useState("");
+  const [cid, setcid] = React.useState(0);
+  const [studentid, setstudentid] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [nationality, setNationality] = useState("");
 
   useEffect(() => {
     //let authToken = sessionStorage.getItem('Auth Token')   
-    let url = 'http://127.0.0.1:5000/api/student/'+auth.currentUser.email.replace("@","%40")+'/'+authToken+'/'
+    let url = ConfigData.studentapi+auth.currentUser.email.replace("@","%40")+'/'+authToken
 
         if (authToken) {
+            navigate('/studentprogress1')
             fetch(url,{
       				method:'GET',
       				headers : {
@@ -28,23 +31,23 @@ function StudentStep1() {
       				}
     				})
     				.then(response => response.json())
-            .then(response => {response.forEach(function(obj) { var output = obj.first_name+" "+obj.last_name;
-              setusername(output); studentid = obj.uuid;})})
+            .then(response => {response.forEach(function(obj) { 
+              var output = obj.first_name+" "+obj.last_name;
+              setusername(output);
+              setstudentid(obj.uuid);
+              let url1 = ConfigData.citizenapi+obj.uuid+'/'+authToken
+              fetch(url1,{
+              method:'GET',
+              headers : {
+                'Content-Type':'application/json',
+                'Access-Control-Allow-Origin':'*',
+              },
+              })
+              .then(response => response.json())
+              .then(response => {response.forEach(function(obj) {setNationality(obj.country);});})
+              .catch(error => console.log(error))
+            })})
             .catch(error => console.log(error))
-
-            let url1 = 'http://127.0.0.1:5001/api/citizen_of/'+studentid+'/'+authToken+'/'
-						fetch(url1,{
-      				method:'GET',
-      				headers : {
-        				'Content-Type':'application/json',
-        				'Access-Control-Allow-Origin':'*',
-      				},
-    				})
-    				.then(response => response.json())
-            .then(response => {response.forEach(function(obj) {setNationality(obj.country);
-            	console.log(obj); });})
-            .catch(error => console.log(error))
-            navigate('/studentprogress1')
         }
 
         if (!authToken) {
@@ -54,6 +57,7 @@ function StudentStep1() {
 
   const handlenationalityChange = e =>{
   	setNationality(e.target.value);
+
   	sessionStorage.setItem("nationality",e.target.value);
   }
 
@@ -64,58 +68,55 @@ function StudentStep1() {
 		navigate("/login");
 	}
 
-	const handleNext = () =>{
+	async function handleNext(event){
 		event.preventDefault();
 		
 			if(nationality!=="")
 			{
-				let url1 = 'http://127.0.0.1:5000/api/citizen_of/'+studentid+'/'+authToken
-				let cid = "";
+				let url1 = ConfigData.citizenapi+studentid+'/'+authToken
 				let outputlength = 0;
 				fetch(url1,{
-      				method:'GET',
-      				headers : {
-        				'Content-Type':'application/json'
-      				},
-    				})
-    				.then(response => response.json())
-            .then(response => {outputlength=response.length; response.forEach(function(obj) {cid = obj.uuid;
-            	console.log(obj); });})
-            .catch(error => console.log(error))
+      		method:'GET',
+      		headers : {
+        		'Content-Type':'application/json'
+      		},
+    		})
+    		.then(response => response.json())
+        .then(response => {outputlength=response.length; response.forEach(function(obj) {
         if(outputlength==0)
         {
-        	let url2 = 'http://127.0.0.1:5000/api/citizen_of/'+authToken
-        	fetch(url2,{
-      				method:'POST',
-      				headers : {
-        				'Content-Type':'application/json'
-      				},
-      				body: JSON.stringify({
-      						student_id: studentid,
-      						country: nationality,
-      					}),
-    				})
-    				.then(response => response.json())
+          let url2 = ConfigData.citizenapi+authToken
+          var bodyv = "student_id="+studentid+"country="+nationality;
+          fetch(url2,{
+              method:'POST',
+              headers : {
+                'Content-Type':'application/json'
+              },
+              body: bodyv,
+            })
+            .then(response => response.json())
             .then(response => {response.forEach(function(obj) {console.log(obj); });})
             .catch(error => console.log(error))
         }
-        else
+        else if(outputlength>0)
         {
-        	let url3 = 'http://127.0.0.1:5000/api/citizen_of/'+cid+'/'+authToken
-        	fetch(url3,{
-      				method:'PUT',
-      				headers : {
-        				'Content-Type':'application/json'
-      				},
-      				body: JSON.stringify({
-      						country: nationality,
-      					}),
-    				})
-    				.then(response => response.json())
-            .then(response => {response.forEach(function(obj) {console.log(obj); });})
+          let url3 = ConfigData.citizenapi+obj.uuid+'/'+authToken
+          var bodyv = "country="+nationality;
+          fetch(url3,{
+              method:'PUT',
+              headers : {
+                Accept: 'application/json',
+                'Content-Type':'application/x-www-form-urlencoded',
+              },
+              body: bodyv,
+            })
+            .then(response => response.json())
+            .then(response => { console.log(response);})
             .catch(error => console.log(error))
         }
-				navigate("/studentprogress2")
+        });})
+        .catch(error => console.log(error))
+				await navigate("/studentprogress2")
 			}
 			else{
 				alert('No nationality found, it needs to not be empty');

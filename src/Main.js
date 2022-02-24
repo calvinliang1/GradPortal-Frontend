@@ -1,10 +1,13 @@
 import React, { useState,useEffect} from "react";
-import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,IconButton,Menu,MenuItem,
+import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,IconButton,Menu,MenuItem,Stack,
 	Card,CardContent,Divider,CardActions} from "@mui/material";
 import {MenuIcon,AccountCircle} from '@mui/icons-material/';
 import PropTypes from 'prop-types';
 import { Link as RouterLink,useNavigate} from 'react-router-dom';
 import {auth,signout} from './Firebase';
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+import {option1,option2} from './ChartOptions'
 
 function Main()
 {
@@ -83,6 +86,10 @@ function Main()
 						</Toolbar>			
 					</AppBar>
 				</Box>
+        <Stack direction="row" spacing={6} sx={{pt: "20px"}} justifyContent="center">
+        <HighchartsReact highcharts={Highcharts} options={option1} />
+        <HighchartsReact highcharts={Highcharts} options={option2} />
+        </Stack>
 		</div>
 	);
 }

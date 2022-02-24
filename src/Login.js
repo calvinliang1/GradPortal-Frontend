@@ -37,12 +37,12 @@ function Login(){
 		await signin(userName, passWord).then((response) => {
 					console.log(response)
           sessionStorage.setItem('Auth Token', response._tokenResponse.idToken)
-          if(sessionStorage.getItem("finished")!=null){
+          //if(sessionStorage.getItem("finished")!=null){
       			navigate("/in");
-        	}
-          else{
-          	navigate('/studentprogress1')
-          }
+        	//}
+          //else{
+          	//navigate('/studentprogress1')
+          //}
         }).catch((error) => {
   					alert("Re-type user info, password or username may be wrong or does not exist");
 					});

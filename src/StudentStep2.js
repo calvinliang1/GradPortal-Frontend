@@ -9,7 +9,7 @@ function StudentStep2 () {
 	let navigate = useNavigate();
 
   const [academicinfolist, setacainfolist] = useState(JSON.parse(sessionStorage.getItem("academicinfolist"))||
-    [{country:"",aname:"",degree_type:"", start_date:"",end_date:"",gpa:""}]);
+    [{aname:"",major:"",degree_type:"",start_date:"",end_date:"",gpa:""}]);
 
   useEffect(() => {
     let authToken = sessionStorage.getItem('Auth Token')
@@ -25,8 +25,8 @@ function StudentStep2 () {
   
   const handleAddClick= event =>{
     event.preventDefault()
-    let academics = academicinfolist.concat([{country:"",aname:"",degree_type:"",
-		start_month:"",start_year:"",end_month:"",end_year:"",gpa:""}]);
+    let academics = academicinfolist.concat([{aname:"",major:"",degree_type:"",
+		start_date:"",end_date:"",gpa:""}]);
     setacainfolist(academics);
     sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
   }
@@ -57,9 +57,8 @@ function StudentStep2 () {
     for(var i=0;i<academicinfolist.length;i++)
     {
     	let academics = [...academicinfolist];
-      if(academics[i].country===""||academics[i].aname===""||academics[i].degree_type===""||
-      	academics[i].start_month===""||academics[i].start_year===""||academics[i].end_month===""||
-      	academics[i].end_year===""||academics[i].gpa===""){
+      if(academics[i].aname===""||academics[i].degree_type===""||academics[i].major===""||
+      	academics[i].start_date===""||academics[i].end_date===""||academics[i].gpa===""){
         noempty=1;
         break;
       }
@@ -110,19 +109,6 @@ function StudentStep2 () {
 							<div key={index} className="academicpart">
 									<Grid container direction="row">
 										<Grid item lg={6}>
-												<Typography variant="h6">Country of Academic Institution</Typography>
-										</Grid>	
-										<Grid item lg={6} key={index}>	
-												<Select value={info.country} label="" size='small' onChange=
-                          {handleInputChange(index)} name="country" required autoFocus>
-                          <MenuItem value={"US"}>US</MenuItem>
-                          <MenuItem value={"Canada"}>Canada</MenuItem>
-                          <MenuItem value={"Other"}>Other</MenuItem>
-                        </Select>
-										</Grid>
-									</Grid>
-									<Grid container direction="row">
-										<Grid item lg={6}>
 											<Typography variant="h6">Academic Institution name</Typography>
 										</Grid>	
 										<Grid item lg={6} key={index}>
@@ -131,9 +117,19 @@ function StudentStep2 () {
                           <MenuItem value={"UWO"}>UWO</MenuItem>
                           <MenuItem value={"UW"}>UW</MenuItem>
                           <MenuItem value={"UT"}>UT</MenuItem>
+                          <MenuItem value={"Other"}>Other</MenuItem>
                         </Select>
 										</Grid>	
 									</Grid>
+                  <Grid container direction="row">
+                    <Grid item lg={6}>
+                        <Typography variant="h6">Major</Typography>
+                    </Grid> 
+                    <Grid item lg={6} key={index}>  
+                        <TextField type="text" name="major" size='small' value={info.major} onChange=
+                          {handleInputChange(index)} name="major" required autoFocus key={index}/>
+                    </Grid>
+                  </Grid>
 									<Grid container direction="row">
 										<Grid item lg={6}>
 											<Typography variant="h6">Degree Type</Typography>

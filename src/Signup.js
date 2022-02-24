@@ -48,16 +48,15 @@ function Signup () {
           		sessionStorage.setItem('Auth Token', response._tokenResponse.idToken)
           		let authToken = sessionStorage.getItem('Auth Token')
           		let url = 'http://127.0.0.1:5000/api/student/'+authToken
+          		var postbody = "first_name="+firstname+"&"+"last_name="+lastname+"&"
+          		+"email_address="+auth.currentUser.email;
           		fetch(url,{
           			headers : {
-        					'Content-Type':'application/json'
+        					Accept: 'application/json',
+                	'Content-Type':'application/x-www-form-urlencoded',
       					},
       					method:'POST',
-      					body: JSON.stringify({
-      						first_name: firstName,
-      						last_name: lastName,
-      						email_address: auth.currentUser.email,
-      					}),
+      					body: postbody,
     					})
     					.then(response => response.json())
     					.then(response => {response.forEach(function(obj) { console.log(obj); });})
