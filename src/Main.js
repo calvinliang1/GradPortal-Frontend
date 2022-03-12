@@ -7,7 +7,8 @@ import { Link as RouterLink,useNavigate} from 'react-router-dom';
 import {auth,signout} from './Firebase';
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import {option1,option2} from './ChartOptions'
+import ConfigData from "./config.json";
+import {option1,option2,option3,option4} from './ChartOptions'
 
 function Main()
 {
@@ -17,9 +18,9 @@ function Main()
 
 	useEffect(() => {
     let authToken = sessionStorage.getItem('Auth Token')
-    let url = 'http://127.0.0.1:5000/api/student/'+auth.currentUser.email.replace("@","%40")+'/'+authToken
-
+    let url = ConfigData.studentapi+auth.currentUser.email.replace("@","%40")+'/'+authToken
         if (authToken) {
+          console.log(option1)
           fetch(url,{
               method:'GET',
               headers : {
@@ -49,6 +50,7 @@ function Main()
 
   const handleClose = () => {
     setAnchorEl(null);
+    navigate("/studentprogress1");
   };
 	return(
 		<div>
@@ -79,7 +81,7 @@ function Main()
                   onClose={handleClose}
                 >
                   <MenuItem onClick={handleClose}>Profile</MenuItem>
-                  <MenuItem onClick={handleClose}>Settings</MenuItem>
+                  {/*<MenuItem onClick={handleClose}>Settings</MenuItem>*/}
                 </Menu>
               </Box>
 							<Button color="inherit" component={RouterLink} to="/login" onClick={handleLogout}>Logout</Button>
@@ -89,6 +91,10 @@ function Main()
         <Stack direction="row" spacing={6} sx={{pt: "20px"}} justifyContent="center">
         <HighchartsReact highcharts={Highcharts} options={option1} />
         <HighchartsReact highcharts={Highcharts} options={option2} />
+        </Stack>
+        <Stack direction="row" spacing={6} sx={{pt: "20px"}} justifyContent="center">
+        <HighchartsReact highcharts={Highcharts} options={option3} />
+        <HighchartsReact highcharts={Highcharts} options={option4} />
         </Stack>
 		</div>
 	);

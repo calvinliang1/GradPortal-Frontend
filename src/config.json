@@ -1,0 +1,17 @@
+{
+	"teststudentapi": "http://127.0.0.1:5000/api/student/",
+	"testcitizenapi": "http://127.0.0.1:5001/api/citizen_of/",
+	"testcountryapi": "http://127.0.0.1:5002/api/country/",
+	"studentapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8090/api/student/",
+	"citizenapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8084/api/citizen_of/",
+	"countryapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8085/api/country/",
+	"acainstapi":"http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8080/api/academic_institution/",
+	"accompapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8081/api/accomplishment/",
+	"attendapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8082/api/attend/",
+	"certapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8083/api/certification/",
+	"fileapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8086/api/file/",
+	"interestinapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8087/api/interest_in/",
+	"pursueapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8088/api/pursue",
+	"researchapi": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8089/api/research/",
+	"work_experience_api": "http://grad-portal-alb-1658898757.ca-central-1.elb.amazonaws.com:8091/api/work_experience/"
+}

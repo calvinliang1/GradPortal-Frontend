@@ -28,8 +28,10 @@ module.exports = {
   },
   externals: {
         'ConfigData': {
-            studentapi: 'http://127.0.0.1:5000/api/student/',
-            citzenapi: 'http://127.0.0.1:5001/api/citizen_of/'
+            studentapi: 'http://127.0.0.1:5000/api/student/doc',
+            citzenapi: 'http://127.0.0.1:5001/api/citizen_of/doc',
+            countryapi: 'http://127.0.0.1:5002/api/country/doc'
+
         }
     }
 }

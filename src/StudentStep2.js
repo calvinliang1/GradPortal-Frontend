@@ -1,26 +1,94 @@
 import React, { useState,useEffect  } from "react";
-import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,MenuItem,
-  Divider,LinearProgress,InputLabel} from "@mui/material";
+import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,Stack,Select,IconButton,Menu,MenuItem,
+  Card,CardContent,Divider,LinearProgress} from "@mui/material";
+import {MenuIcon,AccountCircle} from '@mui/icons-material/';
 import { Link as RouterLink, MemoryRouter, useNavigate} from 'react-router-dom';
 import './login.css';
 import {auth,signout} from './Firebase';
+import {option2,option1} from './ChartOptions'
+import ConfigData from "./config.json";
 
 function StudentStep2 () {
 	let navigate = useNavigate();
-
-  const [academicinfolist, setacainfolist] = useState(JSON.parse(sessionStorage.getItem("academicinfolist"))||
+  let authToken = sessionStorage.getItem('Auth Token')
+  const [academicinfolist, setacainfolist] = useState(/*JSON.parse(sessionStorage.getItem("academicinfolist"))||*/
     [{aname:"",major:"",degree_type:"",start_date:"",end_date:"",gpa:""}]);
+  const [username, setusername] = React.useState("");
+  const [aid, setaid] = React.useState(0);
+  const [studentid, setstudentid] = React.useState(0);
+  const [ainstlist, setainstList] = useState([""]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   useEffect(() => {
-    let authToken = sessionStorage.getItem('Auth Token')
+    let url = ConfigData.studentapi+auth.currentUser.email.replace("@","%40")+'/'+authToken
 
         if (authToken) {
             navigate('/studentprogress2')
+            fetch(url,{
+              method:'GET',
+              headers : {
+                'Content-Type':'application/json',
+                'Access-Control-Allow-Origin':'*'
+              }
+            })
+            .then(response => response.json())
+            .then(response => {response.forEach(function(obj) { 
+              var output = obj.first_name+" "+obj.last_name;
+              setusername(output);
+              setstudentid(obj.uuid);
+              let url1 = ConfigData.attendapi+obj.uuid+'/'+authToken
+              fetch(url1,{
+              method:'GET',
+              headers : {
+                'Content-Type':'application/json',
+                'Access-Control-Allow-Origin':'*',
+              },
+              })
+              .then(response => response.json())
+              .then(response => {
+                let index = 0; let academics = [...academicinfolist];
+                response.forEach(function(obj) {
+                  academics[index]={...academics[index],aname: obj.academic_institution_name};
+                  academics[index]={...academics[index],major: obj.research_name};
+                  academics[index]={...academics[index],degree_type: obj.degree};
+                  academics[index]={...academics[index],start_date: obj.start_date};
+                  academics[index]={...academics[index],end_date: obj.end_date};
+                  academics[index]={...academics[index],gpa: obj.gpa};
+                  index++;
+                });setacainfolist(academics);})
+              .catch(error => console.log(error))
+            })})
+            .catch(error => console.log(error));
         }
 
         if (!authToken) {
             navigate('/login')
         }
+    },[]);
+  useEffect(() => {
+    let url2 = ConfigData.acainstapi+authToken;
+      if(authToken){
+        navigate('/studentprogress2');
+        fetch(url2,{
+              method:'GET',
+              headers : {
+                'Content-Type':'application/json',
+                'Access-Control-Allow-Origin':'*'
+              }
+            })
+            .then(response => response.json())
+            .then(response => {
+              var output = []
+              response.forEach(function(obj) { 
+                output.push(obj.name);
+              })
+              setainstList(output);
+          })
+            .catch(error => console.log(error));
+      }
+      else if (!authToken) {
+            navigate('/login')
+      }
     },[]);
   
   const handleAddClick= event =>{
@@ -28,7 +96,7 @@ function StudentStep2 () {
     let academics = academicinfolist.concat([{aname:"",major:"",degree_type:"",
 		start_date:"",end_date:"",gpa:""}]);
     setacainfolist(academics);
-    sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
+    //sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
   }
 
   const handleDelete = i => e => {
@@ -39,7 +107,7 @@ function StudentStep2 () {
         ...academicinfolist.slice(i + 1)
       ]
       setacainfolist(academics);
-      sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
+      //sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
     }
   }
 
@@ -48,10 +116,10 @@ function StudentStep2 () {
   	let academics = [...academicinfolist];
   	academics[index]={...academics[index],[name]: value};
   	setacainfolist(academics);
-    sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
+    //sessionStorage.setItem("academicinfolist",JSON.stringify(academics));
   }
 
-  const handleSubmit =() => {
+  const handleSubmit = event =>{
     event.preventDefault();
     var noempty = 0;
     for(var i=0;i<academicinfolist.length;i++)
@@ -63,10 +131,79 @@ function StudentStep2 () {
         break;
       }
     }
-    if(noempty==0)
+    if(noempty==0){
+      if(option1.series[0].data[1].y==20){
+        option1.series[0].data[1].y=0
+        option1.series[0].data[5].y+=20
+      }
+      else{}
+      let url1 = ConfigData.attendapi+studentid+'/'+authToken
+      let outputlength = 0;
+      console.log("got here 2")
+      sessionStorage.setItem("Step2",0);
+      fetch(url1,{
+        method:'GET',
+        headers : {
+          'Content-Type':'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(response => {
+        outputlength=response.length; 
+        if(outputlength==0)
+        {
+          let url2 = ConfigData.attendapi+authToken
+          for(var i=0; i<academicinfolist.length;i++){
+            let academics = [...academicinfolist];
+            var bodyv = "academic_institution_name="+academics[i].aname.replace(" ","%20")
+            +"&research_name="+academics[i].major.replace(" ","%20")+
+            "&degree="+academics[i].degree_type+"&student_id="+studentid+"&start_date="+academics[i].start_date+
+            "&end_date="+academics[i].end_date+"&gpa="+academics[i].gpa;
+            fetch(url2,{
+              method:'POST',
+              headers : {
+                'accept': 'application/json',
+                'Content-Type':'application/x-www-form-urlencoded'
+              },
+              body: bodyv,
+            })
+            .then(response => response.json())
+            .then(response => {response.forEach(function(obj) {console.log(obj); });})
+            .catch(error => console.log(error))
+          }
+        }
+        else{
+        response.forEach(function(obj) {
+          let url3 = ConfigData.citizenapi+obj.uuid+'/'+authToken
+          var bodyv = "academic_institution_name="+academics[i].aname.replace(" ","%20")
+            +"research_name="+academics[i].major.replace(" ","%20")+
+          "degree="+academics[i].degree_type+"student_id="+studentid+"start_date="+academics[i].start_date+
+          "end_date="+academics[i].end_date+"gpa="+academics[i].gpa;
+          fetch(url3,{
+            method:'PUT',
+            headers : {
+              Accept: 'application/json',
+              'Content-Type':'application/x-www-form-urlencoded',
+            },
+            body: bodyv,
+          })
+          .then(response => response.json())
+          .then(response => { console.log(response);})
+          .catch(error => console.log(error))
+      });}
+    })
+      .catch(error => console.log(error))
+      navigate("/studentprogress3")
+    }
+    else{
+      if(option1.series[0].data[1].y==0){
+        option1.series[0].data[1].y=20
+        option1.series[0].data[5].y-=20
+      }
+      else{}
+      sessionStorage.setItem("Step2",20);
       navigate("/studentprogress3");
-    else
-      alert('Empty interest field');
+    }  
   }
   const handleBefore =() =>{
     navigate("/studentprogress1");
@@ -77,16 +214,49 @@ function StudentStep2 () {
     sessionStorage.removeItem('Auth Token');
     navigate("/Login");
   }
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 	
 		return (
     	<div>
         <Box>
           <AppBar position="static" alignitems="center" color="primary">
-						<Toolbar>
-							<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Gradportal</Typography>
-							<Button color="inherit" component={RouterLink} to="/login" onClick={handleLogout}>Logout</Button>
-						</Toolbar>			
-					</AppBar>
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Gradportal</Typography>
+              <Box justifyContent="center">
+                <Typography variant="h6" component="span" sx={{ flexGrow: 1 }}>{username}</Typography>
+                <IconButton size="large" aria-label="account of current user" aria-controls="menu-appbar"
+                  aria-haspopup="true" onClick={handleMenu} color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                  }}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                </Menu>
+              </Box>
+              <Button color="inherit" onClick={handleLogout} >Logout</Button>
+            </Toolbar>      
+          </AppBar>
 				</Box>
 				<Box>
 					<Box justifyContent="center" sx={{ display: 'flex',pt: "10px"}}>
@@ -114,10 +284,12 @@ function StudentStep2 () {
 										<Grid item lg={6} key={index}>
 												<Select value={info.aname} label="" size='small' onChange=
                           {handleInputChange(index)} name="aname"required autoFocus>
+                          {ainstlist.map(ainst=>(<MenuItem key={ainst} value={ainst}>{ainst}</MenuItem>))}
+                          {/*
                           <MenuItem value={"UWO"}>UWO</MenuItem>
                           <MenuItem value={"UW"}>UW</MenuItem>
                           <MenuItem value={"UT"}>UT</MenuItem>
-                          <MenuItem value={"Other"}>Other</MenuItem>
+                          <MenuItem value={"Other"}>Other</MenuItem>*/}
                         </Select>
 										</Grid>	
 									</Grid>
@@ -137,9 +309,9 @@ function StudentStep2 () {
 										<Grid item lg={6} key={index}>
 												<Select value={info.degree_type} label="" size='small' onChange=
                           {handleInputChange(index)} name="degree_type" required autoFocus>
-                          <MenuItem value={"BS"}>BS</MenuItem>
-                          <MenuItem value={"MS"}>MS</MenuItem>
-                          <MenuItem value={"DS"}>DS</MenuItem>
+                          <MenuItem value={"bachelor"}>bachelor</MenuItem>
+                          <MenuItem value={"master"}>master</MenuItem>
+                          <MenuItem value={"doctoral"}>doctoral</MenuItem>
                         </Select>
 										</Grid>	
 									</Grid>

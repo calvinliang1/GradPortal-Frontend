@@ -1,10 +1,12 @@
 import React,{ useState } from "react";
 import {Button,TextField,Grid,Paper,AppBar,Typography,Toolbar,Box,
-	Card,CardContent,Divider,CardActions} from "@mui/material";
+	Card,CardContent,Divider,CardActions, Alert, Snackbar} from "@mui/material";
 import { Link as RouterLink, useNavigate, Navigate} from 'react-router-dom';
 import './login.css';
 import {onAuthStateChanged} from "firebase/auth";
 import {signup,auth} from './Firebase';
+import ConfigData from "./config.json";	
+import validator from 'validator';
 
 function Signup () {
 	let navigate = useNavigate();
@@ -14,6 +16,8 @@ function Signup () {
   const [firstName, setFirstname] = useState("");
   const [lastName, setLastname] = useState("");
   const [vpassWord, setvPassword] = useState('');
+  const [open, setOpen] = React.useState(false)
+
 
   const handlefirstnameChange = e =>{
   	setFirstname(e.target.value);
@@ -37,6 +41,10 @@ function Signup () {
   	setvPassword(e.target.value);
   }
 
+  const handleClick = () => {
+  	setOpen(!open)
+	}
+
 	async function handleSubmit(event) {
 		event.preventDefault();
 			if(userName.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)&& passWord.length>=8)
@@ -44,27 +52,32 @@ function Signup () {
 				if(firstName.match(/^[A-Za-z]+$|^[A-Za-z]+-[A-Za-z]+$/) && lastName.match(/^[A-Za-z]+$|^[A-Za-z]+-[A-Za-z]+$/))
 				{
 					if(passWord===vpassWord){
+						if(!validator.isEmail(userName))
+							alert("not valid email")
+						else{
 						await signup(userName, passWord).then((response) => {
           		sessionStorage.setItem('Auth Token', response._tokenResponse.idToken)
           		let authToken = sessionStorage.getItem('Auth Token')
-          		let url = 'http://127.0.0.1:5000/api/student/'+authToken
-          		var postbody = "first_name="+firstname+"&"+"last_name="+lastname+"&"
+          		let url = ConfigData.studentapi+authToken
+          		var postbody = "first_name="+firstName+"&"+"last_name="+lastName+"&"
           		+"email_address="+auth.currentUser.email;
           		fetch(url,{
           			headers : {
         					Accept: 'application/json',
-                	'Content-Type':'application/x-www-form-urlencoded',
+                			'Content-Type':'application/x-www-form-urlencoded',
       					},
       					method:'POST',
       					body: postbody,
     					})
     					.then(response => response.json())
-    					.then(response => {response.forEach(function(obj) { console.log(obj); });})
+    					//.then(response => {response.forEach(function(obj) { console.log(obj); });})
     					.catch(error => alert(error))
-          		navigate('/studentprogress1')
+          				navigate('/in')
         		}).catch((error) => {
-  						alert("Email address exists already! Enter another one");
-						});
+        				console.log("got here")
+        				handleClick()
+  						//alert("Email address exists already! Enter another one");
+						});}
 					}
 					else
 						alert('Verify the two passwords are right, not the same!');
@@ -119,7 +132,12 @@ function Signup () {
 												onChange={handlevpasswordChange} required autoFocus/>
 											</Grid>
 											<Grid item>
-												<Button variant="contained" color="primary" type="submit" className="button-block">Sign up now</Button>
+												<Button variant="contained" color="primary" type="submit" className="button-block" >Sign up now</Button>
+											</Grid>
+											<Grid item>
+												<Snackbar open={open} autoHideDuration={6000}>
+      										<Alert severity="error" sx={{ width: '100%' }}>Email address exists already! Enter another one</Alert>
+    										</Snackbar>
 											</Grid>
 										</Grid>
 									</form>
