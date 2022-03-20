@@ -134,6 +134,11 @@ function StudentStep5 () {
     }
     if(noempty==0){
       sessionStorage.setItem("Step5",0);
+      console.log(research_interests)
+      for(var i=0;i<option2.series.length;i++)
+      {
+        option2.series[i].visible = false;
+      }
       for(var i=0;i<option2.series.length; i++)
       {
         for(var j=0;j<research_interests.length;j++){
@@ -171,32 +176,7 @@ function StudentStep5 () {
           else{
           if(outputlength!=research_interests.length)
           {
-            response.forEach(function(obj) {
-              let url2 = ConfigData.interestinapi+obj.uuid+authToken
-              fetch(url2,{
-                method:'DELETE',
-                headers : {
-                  Accept: 'application/json',
-                },
-              })
-              .then(response => response.json())
-              .catch(error => console.log(error))
-            });
-            for (var i=0; i<research_interests.length; i++){
-              let url3 = ConfigData.interestinapi+authToken
-              var bodyv = "student_id="+studentid+"&research_name="+research_interests[i];
-              fetch(url3,{
-                method:'POST',
-                headers : {
-                  Accept: 'application/json',
-                  'Content-Type':'application/x-www-form-urlencoded'
-                },
-                body: bodyv,
-              })
-              .then(response => response.json())
-              .then(response => {response.forEach(function(obj) {console.log(obj); });})
-              .catch(error => console.log(error))
-            }
+            deletepost(response)
           }
           else if(outputlength=research_interests.length)
           {
@@ -251,6 +231,39 @@ function StudentStep5 () {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  async function deletepost(response){
+    response.forEach(function(obj) {
+              let url2 = ConfigData.interestinapi+obj.uuid+"/"+authToken
+              fetch(url2,{
+                method:'DELETE',
+                headers : {
+                  Accept: 'application/json',
+                },
+              })
+              .then(response => response.json())
+              .catch(error => console.log(error))
+            });
+    await sleep(800)
+            for (var i=0; i<research_interests.length; i++){
+              let url3 = ConfigData.interestinapi+authToken
+              var bodyv = "student_id="+studentid+"&research_name="+research_interests[i];
+              fetch(url3,{
+                method:'POST',
+                headers : {
+                  Accept: 'application/json',
+                  'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body: bodyv,
+              })
+              .then(response => response.json())
+              .then(response => {response.forEach(function(obj) {console.log(obj); });})
+              .catch(error => console.log(error))
+            }
+  }
+  const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+  }
 		return (
     	<div>
         <Box>

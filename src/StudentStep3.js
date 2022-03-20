@@ -248,7 +248,7 @@ function StudentStep3 (){
 				</Box>
 				<Box sx={{ minWidth: 35, pt: "10px"}}>
         	<Typography variant="h5" color="text.secondary" align="center">Tell us more about your
-        	favourite research interest(s)</Typography>
+        	Accomplishment(s) and certification(s)</Typography>
       	</Box>
       	<Grid container spacing={0} justifyContent="center" direction="row" sx={{pt: "40px"}}>
 					<form style={{minWidth: "800px"}}>
