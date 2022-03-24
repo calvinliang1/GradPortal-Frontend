@@ -6,7 +6,6 @@ npm install --save-dev webpack@4.19.1 webpack-cli@3.1.1 webpack-dev-server@3.1.8
 npm start - development (ran with this so no issues)
 npm build - production (never ran with this)
 3. Show it on server or local
-local: python -m http.server 
-Should show the page on localhost:8000/ 
+npm run serve - runs it using webpack server, should run on localhost:8001
 
 not sure for aws production server you might have to fiddle around it a bit in the webpack.config.js, package.json and package-lock.json
